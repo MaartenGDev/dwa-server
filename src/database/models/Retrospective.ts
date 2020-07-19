@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, {Document} from "mongoose";
+import {IRetrospective} from "../../models/IRetrospective";
 
 const topicSchema = new mongoose.Schema({
     description: String,
@@ -18,4 +19,4 @@ const schema = new mongoose.Schema({
     actions: [actionsSchema],
 });
 
-export const Retrospective = mongoose.model('Retrospective', schema);
+export const Retrospective = mongoose.model<IRetrospective & Document>('Retrospective', schema);

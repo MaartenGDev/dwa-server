@@ -12,6 +12,10 @@ router.get('/', async (req, res, next) => {
             path: 'members.user',
             model: 'User'
         })
+        .populate({
+            path: 'members.role',
+            model: 'Role'
+        })
         .exec((err, teams) => {
             res.json(IdentityMapper.map(teams));
         });

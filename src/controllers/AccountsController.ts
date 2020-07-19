@@ -27,4 +27,10 @@ router.post('/register', async (req, res, next) => {
     }
 });
 
+router.get('/me', async (req, res, next) => {
+    const user = await User.findOne();
+
+    res.json(user);
+});
+
 export default router;

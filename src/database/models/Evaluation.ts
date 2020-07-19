@@ -1,11 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, {Document} from "mongoose";
+import {IEvaluation} from "../../models/IEvaluation";
+import {ITimeUsageCategory} from "../../models/ITimeUsageCategory";
 
 const commentSchema = new mongoose.Schema({
     body: {type: String, required: true},
+    category: {type: mongoose.Schema.Types.ObjectId, ref: 'CommentCategory', required: true},
+});
+
+const timeUsageCategorySchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    color: {type: String, required: true},
+    initialPercentage: {type: Number, required: true},
+    increaseIsPositive: {type: Boolean, required: true},
 });
 
 const timeUsageSchema = new mongoose.Schema({
-    percentage: {type: Number, required: true}
+    percentage: {type: Number, required: true},
+    category: {type: mongoose.Schema.Types.ObjectId, ref: 'TimeUsageCategory', required: true},
 });
 
 const schema = new mongoose.Schema({
@@ -17,4 +28,5 @@ const schema = new mongoose.Schema({
     timeUsage: [timeUsageSchema],
 });
 
-export const Evaluation = mongoose.model('Evaluation', schema);
+export const TimeUsageCategory = mongoose.model<ITimeUsageCategory & Document>('TimeUsageCategory', timeUsageCategorySchema, 'timeUsageCategories');
+export const Evaluation = mongoose.model<IEvaluation & Document>('Evaluation', schema);
