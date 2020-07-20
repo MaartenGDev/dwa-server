@@ -26,11 +26,27 @@ router.get('/:id/report', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        await Retrospective.create(req.body);
+        const retrospective = await Retrospective.create(req.body);
 
-        return res.json({success: true});
+        return res.json(IdentityMapper.map(retrospective));
     } catch (e) {
-        res.json({success: true, message: e.message});
+        res.json({success: false, message: e.message});
+    }
+});
+
+router.patch('/:id', async (req, res, next) => {
+    const retrospective = await Retrospective.findById(req.params.id);
+
+    if(retrospective === null){
+        return res.status(404).json({success: false, message: 'Not found'});
+    }
+
+    try {
+        await retrospective.update(req.body);
+
+        return res.json(IdentityMapper.map(retrospective));
+    } catch (e) {
+        res.json({success: false, message: e.message});
     }
 });
 
