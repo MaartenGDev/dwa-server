@@ -15,6 +15,7 @@ const schema = new mongoose.Schema({
     name: {type: String, required: true},
     startDate: {type: Date, required: true},
     endDate: {type: Date, required: true},
+    team: {type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true},
     topics: [topicSchema],
     actions: [actionsSchema],
 });
