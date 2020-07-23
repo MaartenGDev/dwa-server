@@ -1,28 +1,36 @@
 import {Router} from "express";
 import { v4 as uuidv4 } from 'uuid';
-import {IdentityMapper} from "../mappers/IdentityMapper";
 import {Team} from "../database/models/Team";
+import {TeamMemberRoleIdentifiers} from "../database/TeamMemberRoleIdentifiers";
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
-    await Team
+    const teams = await Team
         .find()
         .populate([
             {path: 'members.user', model: 'User'},
             {path: 'members.role', model: 'Role'}
         ])
-        .exec((err, teams) => {
-            res.json(IdentityMapper.map(teams));
-        });
+        .exec();
+
+    res.json(teams);
 });
 
 router.post('/', async (req, res, next) => {
     try {
-        const team = (await Team.create({...req.body, inviteCode: uuidv4()})).populate([
+        const teamWithMembers = {
+            ...req.body,
+            inviteCode: uuidv4(),
+            members: [
+                {user: '5f1455eaa69a0c1c257ca9e5',  role: TeamMemberRoleIdentifiers.Admin}
+            ]
+        };
+
+        const team = await (await Team.create(teamWithMembers)).populate([
             {path: 'members.user', model: 'User'},
             {path: 'members.role', model: 'Role'}
-        ]);
+        ]).execPopulate();
 
         return res.json(team);
     } catch (e) {
@@ -37,7 +45,7 @@ router.patch('/:id', async (req, res, next) => {
             {path: 'members.role', model: 'Role'}
         ]);
 
-        return res.json(IdentityMapper.map(team));
+        return res.json(team);
     } catch (e) {
         res.json({success: false, message: e.message});
     }

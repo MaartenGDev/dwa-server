@@ -19,4 +19,8 @@ const schema = new mongoose.Schema({
     actions: [actionsSchema],
 });
 
+topicSchema.set('toJSON', {virtuals: true});
+actionsSchema.set('toJSON', {virtuals: true});
+schema.set('toJSON', {virtuals: true});
+
 export const Retrospective = mongoose.model<IRetrospective & Document>('Retrospective', schema);

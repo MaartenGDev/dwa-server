@@ -1,13 +1,12 @@
 import {Router} from "express";
 import {Retrospective} from "../database/models/Retrospective";
-import {IdentityMapper} from "../mappers/IdentityMapper";
 import {IRetrospectiveReport} from "../models/IRetrospectiveReport";
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
     Retrospective.find((err, retrospectives) => {
-        res.json(IdentityMapper.map(retrospectives));
+        res.json(retrospectives);
     });
 });
 
@@ -28,7 +27,7 @@ router.post('/', async (req, res, next) => {
     try {
         const retrospective = await Retrospective.create(req.body);
 
-        return res.json(IdentityMapper.map(retrospective));
+        return res.json(retrospective);
     } catch (e) {
         res.json({success: false, message: e.message});
     }
@@ -44,7 +43,7 @@ router.patch('/:id', async (req, res, next) => {
     try {
         await retrospective.update(req.body);
 
-        return res.json(IdentityMapper.map(retrospective));
+        return res.json(retrospective);
     } catch (e) {
         res.json({success: false, message: e.message});
     }

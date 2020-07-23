@@ -6,7 +6,8 @@
   "scripts": {
     "start": "run-p watch-**",
     "watch-ts": "tsc -w",
-    "watch-node": "nodemon dist/index.js"
+    "watch-node": "nodemon dist/index.js",
+    "seed": "npx ts-node ./src/database/seeder.ts"
   },
   "keywords": [],
   "author": "",

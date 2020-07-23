@@ -9,4 +9,6 @@ const schema = new mongoose.Schema({
     minimalCommentCount: {type: Number, required: true},
 });
 
+schema.set('toJSON', {virtuals: true});
+
 export const CommentCategory = mongoose.model<ICommentCategory & Document>('CommentCategory', schema, 'commentCategories');

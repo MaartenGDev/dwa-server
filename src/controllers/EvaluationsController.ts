@@ -1,6 +1,4 @@
 import {Router} from "express";
-import {Retrospective} from "../database/models/Retrospective";
-import {IdentityMapper} from "../mappers/IdentityMapper";
 import {Evaluation} from "../database/models/Evaluation";
 
 const router = Router();

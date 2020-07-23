@@ -28,5 +28,10 @@ const schema = new mongoose.Schema({
     timeUsage: [timeUsageSchema],
 });
 
+commentSchema.set('toJSON', {virtuals: true});
+timeUsageCategorySchema.set('toJSON', {virtuals: true});
+timeUsageSchema.set('toJSON', {virtuals: true});
+schema.set('toJSON', {virtuals: true});
+
 export const TimeUsageCategory = mongoose.model<ITimeUsageCategory & Document>('TimeUsageCategory', timeUsageCategorySchema, 'timeUsageCategories');
 export const Evaluation = mongoose.model<IEvaluation & Document>('Evaluation', schema);

@@ -1,4 +1,4 @@
-import mongoose, {Document} from "mongoose";
+import mongoose, {Document, Schema} from "mongoose";
 import {ITeam} from "../../models/ITeam";
 import {ITeamMember} from "../../models/ITeamMember";
 import {IRole} from "../../models/IRole";
@@ -22,6 +22,11 @@ const schema = new mongoose.Schema({
     members: [teamMemberSchema],
 });
 
-export const Role = mongoose.model<IRole & Document>('Role', roleSchema);
-export const TeamMember = mongoose.model<ITeamMember & Document>('TeamMember', teamMemberSchema);
-export const Team = mongoose.model<ITeam & Document>('Team', schema);
+roleSchema.set('toJSON', {virtuals: true});
+teamMemberSchema.set('toJSON', {virtuals: true});
+schema.set('toJSON', {virtuals: true});
+
+export const Role = mongoose.model<IRole>('Role', roleSchema);
+export const TeamMember = mongoose.model<ITeamMember>('TeamMember', teamMemberSchema);
+export const Team = mongoose.model<ITeam>('Team', schema);
+

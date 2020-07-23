@@ -12,4 +12,13 @@ const schema = new mongoose.Schema({
     password: {type: String, required: true},
 });
 
+schema.set('toJSON', {
+    virtuals: true, transform: (doc, ret) => {
+        ret.id = ret._id;
+
+        delete ret.password;
+        return ret;
+    }
+});
+
 export const User = mongoose.model<IUser & mongoose.Document>('User', schema);
