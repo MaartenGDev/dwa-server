@@ -1,4 +1,4 @@
-import mongoose, {Document, Schema} from "mongoose";
+import mongoose from "mongoose";
 import {ITeam} from "../../models/ITeam";
 import {ITeamMember} from "../../models/ITeamMember";
 import {IRole} from "../../models/IRole";

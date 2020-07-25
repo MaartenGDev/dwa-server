@@ -1,5 +1,7 @@
+import {EntityIdentifier} from "../types";
+
 export interface IUser {
-    id: number;
+    id: EntityIdentifier;
     fullName: string;
     email: string;
     password: string;

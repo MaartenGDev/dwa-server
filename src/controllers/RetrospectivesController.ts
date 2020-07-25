@@ -55,7 +55,7 @@ router.patch('/:id', async (req, res, next) => {
     }
 
     try {
-        await retrospective.update(req.body);
+        await retrospective.updateOne(req.body);
 
         return res.json(retrospective);
     } catch (e) {

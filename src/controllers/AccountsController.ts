@@ -1,5 +1,6 @@
 import {Router} from "express";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import {User} from "../database/models/User";
 const router = Router();
 
@@ -9,10 +10,16 @@ router.post('/login', async (req, res, next) => {
     const hasCorrectPassword = await bcrypt.compare(req.body.password, user?.password);
 
     if(!hasCorrectPassword){
-        return res.status(401).json({success: false, message: 'Unauthorized'});
+        return res.status(200).json({success: false, message: 'Unauthorized'});
     }
 
-    res.json(user);
+    const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET, { expiresIn: '1800s' });
+
+    res.json({
+        success: true,
+        token,
+        user
+    });
 });
 
 router.post('/register', async (req, res, next) => {
@@ -28,7 +35,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.get('/me', async (req, res, next) => {
-    const user = await User.findOne();
+    const user = await User.findById(req.auth.userId);
 
     res.json(user);
 });

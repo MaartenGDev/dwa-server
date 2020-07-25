@@ -4,4 +4,5 @@ export const connection = mongoose.connect('mongodb://localhost/retrospective', 
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
 });
