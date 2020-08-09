@@ -20,8 +20,10 @@ const timeUsageSchema = new mongoose.Schema({
 });
 
 const schema = new mongoose.Schema({
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     retrospective: {type: mongoose.Schema.Types.ObjectId, ref: 'Retrospective', required: true},
     sprintRating: {type: Number, required: true},
+    sprintRatingExplanation: {type: String},
     suggestedActions: String,
     suggestedTopics: String,
     comments: [commentSchema],

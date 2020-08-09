@@ -1,10 +1,24 @@
 import {Router} from "express";
 import {Retrospective} from "../database/models/Retrospective";
 import {IRetrospectiveReport} from "../models/IRetrospectiveReport";
+import {IUserRetrospective} from "../models/IUserRetrospective";
+import {Evaluation} from "../database/models/Evaluation";
+import {IEvaluation} from "../models/IEvaluation";
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
+    const evaluationsOfUser = (await Evaluation.find({user: req.auth.userId})
+        .populate([
+            {path: 'comments', model: 'Comment'},
+            {path: 'timeUsage', model: 'TimeUsage'},
+        ])
+        .exec())
+        .reduce((acc: {[key: string]: IEvaluation}, cur) => {
+            acc[cur.retrospective as any] = cur.toObject();
+            return acc;
+        }, {});
+
     const retrospectives = await Retrospective
         .find()
         .populate([
@@ -12,7 +26,23 @@ router.get('/', async (req, res, next) => {
         ])
         .exec();
 
-    res.json(retrospectives);
+    const userRetrospectives: IUserRetrospective[] = retrospectives.map(retro => {
+        return {
+            id: retro.id,
+            name: retro.name,
+            startDate: retro.startDate,
+            endDate: retro.endDate,
+            topics: retro.topics,
+            actions: retro.actions,
+            evaluation: evaluationsOfUser[retro.id],
+            teamId: retro.team.id,
+            team: retro.team,
+        }
+    })
+
+    console.log(userRetrospectives)
+
+    res.json(userRetrospectives);
 });
 
 router.get('/:id/report', async (req, res, next) => {
@@ -62,5 +92,6 @@ router.patch('/:id', async (req, res, next) => {
         res.json({success: false, message: e.message});
     }
 });
+
 
 export default router;

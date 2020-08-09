@@ -2,6 +2,7 @@ import mongoose, {Document} from "mongoose";
 import {IRetrospective} from "../../models/IRetrospective";
 
 const topicSchema = new mongoose.Schema({
+    order: Number,
     description: String,
     durationInMinutes: Number
 });
