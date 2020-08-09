@@ -8,23 +8,13 @@ import {IEvaluation} from "../models/IEvaluation";
 const router = Router();
 
 router.get('/', async (req, res, next) => {
-    const evaluationsOfUser = (await Evaluation.find({user: req.auth.userId})
-        .populate([
-            {path: 'comments', model: 'Comment'},
-            {path: 'timeUsage', model: 'TimeUsage'},
-        ])
-        .exec())
+    const evaluationsOfUser = (await Evaluation.find({user: req.auth.userId}))
         .reduce((acc: {[key: string]: IEvaluation}, cur) => {
-            acc[cur.retrospective as any] = cur.toObject();
+            acc[(cur.retrospective as IUserRetrospective).id] = cur.toObject({virtuals: true});
             return acc;
         }, {});
 
-    const retrospectives = await Retrospective
-        .find()
-        .populate([
-            {path: 'team', model: 'Team'},
-        ])
-        .exec();
+    const retrospectives = await Retrospective.find();
 
     const userRetrospectives: IUserRetrospective[] = retrospectives.map(retro => {
         return {
@@ -40,17 +30,11 @@ router.get('/', async (req, res, next) => {
         }
     })
 
-    console.log(userRetrospectives)
-
     res.json(userRetrospectives);
 });
 
 router.get('/:id/report', async (req, res, next) => {
-    const retrospective = await Retrospective.findOne({_id: req.params.id})
-        .populate([
-            {path: 'team', model: 'Team'},
-        ])
-        .exec();
+    const retrospective = await Retrospective.findOne({_id: req.params.id});
 
     const report: IRetrospectiveReport = {
       retrospective,
@@ -64,10 +48,7 @@ router.get('/:id/report', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        const retrospective = await (await Retrospective.create({...req.body, team: req.body.teamId}))
-            .populate([
-                {path: 'team', model: 'Team'},
-            ]).execPopulate();
+        const retrospective = await Retrospective.create({...req.body, team: req.body.teamId});
 
         return res.json(retrospective);
     } catch (e) {
@@ -76,9 +57,7 @@ router.post('/', async (req, res, next) => {
 });
 
 router.patch('/:id', async (req, res, next) => {
-    const retrospective = await Retrospective.findById(req.params.id).populate([
-        {path: 'team', model: 'Team'},
-    ]).exec();
+    const retrospective = await Retrospective.findById(req.params.id);
 
     if(retrospective === null){
         return res.status(404).json({success: false, message: 'Not found'});

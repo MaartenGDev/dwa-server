@@ -5,7 +5,7 @@ import {IUserRetrospective} from "./IUserRetrospective";
 
 export interface IEvaluation {
     id?: string;
-    retrospective: string|IUserRetrospective;
+    retrospective: IUserRetrospective|string;
     sprintRating: number;
     suggestedActions: string;
     suggestedTopics: string;
