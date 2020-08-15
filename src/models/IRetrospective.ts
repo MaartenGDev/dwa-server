@@ -4,7 +4,7 @@ import {IEvaluation} from "./IEvaluation";
 import {ITeam} from "./ITeam";
 
 export interface IRetrospective {
-    id?: number;
+    id?: string;
     name: string;
     startDate: Date;
     endDate: Date;

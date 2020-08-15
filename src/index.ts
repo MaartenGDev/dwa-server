@@ -10,6 +10,7 @@ import TimeUsageCategoriesController from './controllers/TimeUsageCategoriesCont
 import TeamMemberRolesController from './controllers/TeamMemberRolesController'
 import TeamsController from './controllers/TeamsController'
 import AccountController from './controllers/AccountsController'
+import InsightsController from './controllers/InsightsController'
 import {connection} from './database/connection';
 import {jsonErrorHandler} from "./middleware/JsonErrorHandler";
 import {NotFoundHandler} from "./middleware/NotFoundHandler";
@@ -46,6 +47,7 @@ app.use('/commentCategories', CommentCategoriesController);
 app.use('/timeUsageCategories', TimeUsageCategoriesController);
 app.use('/teamMemberRoles', TeamMemberRolesController);
 app.use('/teams', TeamsController);
+app.use('/insights', InsightsController);
 app.use('/account', AccountController);
 
 app.use(NotFoundHandler);
