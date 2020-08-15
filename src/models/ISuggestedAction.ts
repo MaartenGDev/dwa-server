@@ -1,6 +1,6 @@
 import {IUser} from "./IUser";
 
-export interface ISuggestedTopic {
+export interface ISuggestedAction {
     description: string;
     suggestedBy: IUser;
 }

@@ -4,6 +4,10 @@ import {IRetrospectiveReport} from "../models/IRetrospectiveReport";
 import {IUserRetrospective} from "../models/IUserRetrospective";
 import {Evaluation} from "../database/models/Evaluation";
 import {IEvaluation} from "../models/IEvaluation";
+import {ISuggestedTopic} from "../models/ISuggestedTopic";
+import {IUser} from "../models/IUser";
+import {ISuggestedAction} from "../models/ISuggestedAction";
+import {IComment} from "../models/IComment";
 
 const router = Router();
 
@@ -34,13 +38,30 @@ router.get('/', async (req, res, next) => {
 });
 
 router.get('/:id/report', async (req, res, next) => {
-    const retrospective = await Retrospective.findOne({_id: req.params.id});
+    const retrospectiveId = req.params.id;
+    const retrospective = await Retrospective.findOne({_id: retrospectiveId});
+
+    const evaluations = await Evaluation.find({retrospective: retrospectiveId});
+
+    const suggestedActions: ISuggestedAction[] = evaluations
+        .filter(e => e.suggestedActions.length > 0)
+        .map(e => ({description: e.suggestedActions, suggestedBy: e.user as IUser}));
+
+    const suggestedTopics: ISuggestedTopic[] = evaluations
+        .filter(e => e.suggestedTopics.length > 0)
+        .map(e => ({description: e.suggestedTopics, suggestedBy: e.user as IUser}));
+
+    const comments = evaluations.reduce((acc: IComment[], cur: IEvaluation) => [...acc, ...cur.comments.map(c => {
+        const rawObject = (c as any).toObject({virtuals: true});
+        rawObject.evaluation = cur;
+        return rawObject;
+    })], []);
 
     const report: IRetrospectiveReport = {
       retrospective,
-      comments: [],
-      suggestedActions: [],
-      suggestedTopics: []
+      comments,
+      suggestedActions,
+      suggestedTopics
     };
 
     res.json(report);
@@ -64,9 +85,9 @@ router.patch('/:id', async (req, res, next) => {
     }
 
     try {
-        await retrospective.updateOne(req.body);
+        const persistedRetrospective = await Retrospective.findByIdAndUpdate(req.params.id, req.body, {new: true});
 
-        return res.json(retrospective);
+        return res.json(persistedRetrospective);
     } catch (e) {
         res.json({success: false, message: e.message});
     }
