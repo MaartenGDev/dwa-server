@@ -1,5 +1,6 @@
 import mongoose, {Document} from "mongoose";
 import {IRetrospective} from "../../models/IRetrospective";
+import {DateHelper} from "../../helpers/DateHelper";
 
 const topicSchema = new mongoose.Schema({
     order: Number,
@@ -18,12 +19,18 @@ const schema = new mongoose.Schema({
     endDate: {type: Date, required: true},
     team: {type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true, autopopulate: true},
     topics: [topicSchema],
-    actions: [actionsSchema],
+    actions: [actionsSchema]
 });
 
 topicSchema.set('toJSON', {virtuals: true});
 actionsSchema.set('toJSON', {virtuals: true});
-schema.set('toJSON', {virtuals: true});
+schema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        ret.startDate = DateHelper.format(ret.startDate);
+        ret.endDate = DateHelper.format(ret.endDate);
+    }
+});
 
 schema.plugin(require('mongoose-autopopulate'));
 

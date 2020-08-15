@@ -1,5 +1,7 @@
 import {Router} from "express";
 import {Evaluation} from "../database/models/Evaluation";
+import {IEvaluation} from "../models/IEvaluation";
+import {IUserRetrospective} from "../models/IUserRetrospective";
 
 const router = Router();
 
@@ -13,6 +15,17 @@ router.patch('/:id/evaluation', async (req, res, next) => {
 
         const updatedEvaluation = {...req.body, timeUsage, comments, retrospective: req.body.retrospectiveId, user: req.auth.userId};
 
+        if(!isValidEvaluation(updatedEvaluation)){
+            return res.status(400).json({success: false, message: 'Failed to save feedback, the provided feedback is invalid!'});
+        }
+
+        const feedbackPeriodEndDate = new Date((persistedEvaluation.retrospective as IUserRetrospective).endDate);
+
+        if (new Date() > feedbackPeriodEndDate)
+        {
+            return res.status(400).json({success: false, message: `The feedback period for this retrospective has already ended at ${feedbackPeriodEndDate}`});
+        }
+
         const evaluation = persistedEvaluation === null
             ? await Evaluation.create(updatedEvaluation)
             : await Evaluation.findOneAndUpdate(evaluationFilter, updatedEvaluation, {new: true})
@@ -22,5 +35,17 @@ router.patch('/:id/evaluation', async (req, res, next) => {
         res.status(400).json({success: false, message: e.message});
     }
 });
+
+const isValidEvaluation = (evaluation: IEvaluation) => {
+    const totalTimeUsagePercentage = evaluation.timeUsage.reduce((acc, cur) => acc + cur.percentage, 0);
+
+    if (totalTimeUsagePercentage != 100)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 export default router;

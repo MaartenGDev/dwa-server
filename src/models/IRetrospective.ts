@@ -6,8 +6,8 @@ import {ITeam} from "./ITeam";
 export interface IRetrospective {
     id?: number;
     name: string;
-    startDate: string;
-    endDate: string;
+    startDate: Date;
+    endDate: Date;
     topics: ITopic[];
     actions: IAction[];
     evaluation?: IEvaluation;

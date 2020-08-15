@@ -8,6 +8,7 @@ import {ISuggestedTopic} from "../models/ISuggestedTopic";
 import {IUser} from "../models/IUser";
 import {ISuggestedAction} from "../models/ISuggestedAction";
 import {IComment} from "../models/IComment";
+import {DateHelper} from "../helpers/DateHelper";
 
 const router = Router();
 
@@ -24,8 +25,8 @@ router.get('/', async (req, res, next) => {
         return {
             id: retro.id,
             name: retro.name,
-            startDate: retro.startDate,
-            endDate: retro.endDate,
+            startDate: DateHelper.format(retro.startDate),
+            endDate: DateHelper.format(retro.endDate),
             topics: retro.topics,
             actions: retro.actions,
             evaluation: evaluationsOfUser[retro.id],
