@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import {config} from 'dotenv'
 import jwt from 'express-jwt';
-import HomeController from './controllers/HomeController'
 import RetrospectivesController from './controllers/RetrospectivesController'
 import RetrospectiveEvaluationsController from './controllers/RetrospectiveEvaluationsController'
 import CommentCategoriesController from './controllers/CommentCategoriesController'
@@ -35,7 +34,6 @@ app.use(jwt({secret: process.env.JWT_SECRET, algorithms: ['HS256'], requestPrope
 
 app.use(jsonErrorHandler);
 
-app.use('/', HomeController);
 app.use('/retrospectives', RetrospectivesController);
 app.use('/retrospectives', RetrospectiveEvaluationsController);
 app.use('/commentCategories', CommentCategoriesController);

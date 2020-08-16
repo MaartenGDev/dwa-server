@@ -26,8 +26,9 @@ roleSchema.set('toJSON', {virtuals: true});
 teamMemberSchema.set('toJSON', {virtuals: true});
 schema.set('toJSON', {virtuals: true});
 
-schema.plugin(require('mongoose-autopopulate'));
+roleSchema.plugin(require('mongoose-autopopulate'));
 teamMemberSchema.plugin(require('mongoose-autopopulate'));
+schema.plugin(require('mongoose-autopopulate'));
 
 export const Role = mongoose.model<IRole>('Role', roleSchema);
 export const TeamMember = mongoose.model<ITeamMember>('TeamMember', teamMemberSchema);
