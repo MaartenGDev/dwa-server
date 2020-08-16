@@ -2,7 +2,6 @@ import {Router} from "express";
 import {Retrospective} from "../database/models/Retrospective";
 import {Evaluation} from "../database/models/Evaluation";
 import {IUser} from "../models/IUser";
-import {ITeamMemberInsight} from "../models/ITeamMemberInsight";
 import {IRatingInsight} from "../models/IRatingInsight";
 import {IRetrospective} from "../models/IRetrospective";
 import {InsightService} from "../services/InsightService";
@@ -56,9 +55,7 @@ router.get('/teams/:id/members', async (req, res, next) => {
         return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
     }
 
-    const insights: ITeamMemberInsight[] = [
-        {fullName: 'test', latestSprintRating: 1, latestSprintRatingChangePercentage: 10, timeUsage: [], userId: req.auth.userId}
-    ]
+    const insights = await insightService.getTeamMemberInsights(req.params.id);
 
     res.json(insights);
 });

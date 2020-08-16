@@ -6,6 +6,10 @@ import {IMetric} from "../models/IMetric";
 import {IInsight} from "../models/IInsight";
 import {IMetricHistory} from "../models/IMetricHistory";
 import {IRetrospective} from "../models/IRetrospective";
+import {ITeamMemberInsight} from "../models/ITeamMemberInsight";
+import {ITeamMemberTimeUsage} from "../models/ITeamMemberTimeUsage";
+import {User} from "../database/models/User";
+import {IUser} from "../models/IUser";
 
 export class InsightService {
     public async getInsightForTeam(teamId: string, userId = ''): Promise<IInsight> {
@@ -157,5 +161,63 @@ export class InsightService {
             datasets: datasets,
             labels: retrospectiveNames
         };
+    }
+
+    public async getTeamMemberInsights(teamId: string): Promise<ITeamMemberInsight[]> {
+        const retrospective = await Retrospective.findOne({team: teamId}).sort({endDate: 'desc'});
+
+        const timeUsageCategoriesById = (await TimeUsageCategory.find())
+            .reduce((acc: { [key: string]: ITimeUsageCategory }, cur: any) => {
+                acc[cur.id] = cur;
+                return acc;
+            }, {});
+
+        const usersById = (await User.find())
+            .reduce((acc: { [key: string]: IUser }, cur: any) => {
+                acc[cur.id] = cur;
+                return acc;
+            }, {});
+
+        return (await Evaluation.aggregate([
+            {
+                '$match': {
+                    'retrospective': {
+                        '$eq': Types.ObjectId(retrospective.id)
+                    }
+                }
+            }, {
+                '$unwind': {
+                    'path': '$timeUsage'
+                }
+            }, {
+                '$addFields': {
+                    'timeUsage.percentageChangePercentage': 0
+                }
+            }, {
+                '$group': {
+                    '_id': '$user',
+                    'userId': {
+                        '$first': '$user'
+                    },
+                    'latestSprintRating': {
+                        '$first': { $divide: ['$sprintRating', 10] }
+                    },
+                    'latestSprintRatingChangePercentage': {
+                        '$first': 0
+                    },
+                    'timeUsage': {
+                        '$push': '$$ROOT.timeUsage'
+                    }
+                }
+            }
+        ]).exec()).map((res: any) => {
+            res.fullName = usersById[res.userId].fullName
+            res.timeUsage = res.timeUsage.map((tu: ITeamMemberTimeUsage) => {
+                tu.category = timeUsageCategoriesById[tu.category as string];
+                return tu;
+            })
+
+            return res;
+        });
     }
 }
