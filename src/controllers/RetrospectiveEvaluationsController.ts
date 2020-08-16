@@ -2,6 +2,7 @@ import {Router} from "express";
 import {Evaluation} from "../database/models/Evaluation";
 import {IEvaluation} from "../models/IEvaluation";
 import {IUserRetrospective} from "../models/IUserRetrospective";
+import {IRetrospective} from "../models/IRetrospective";
 
 const router = Router();
 
@@ -19,9 +20,9 @@ router.patch('/:id/evaluation', async (req, res, next) => {
             return res.status(400).json({success: false, message: 'Failed to save feedback, the provided feedback is invalid!'});
         }
 
-        const feedbackPeriodEndDate = new Date((persistedEvaluation.retrospective as IUserRetrospective).endDate);
+        const feedbackPeriodEndDate = persistedEvaluation ? new Date((persistedEvaluation.retrospective as IRetrospective).endDate) : null;
 
-        if (new Date() > feedbackPeriodEndDate)
+        if (persistedEvaluation !== null && new Date() > feedbackPeriodEndDate)
         {
             return res.status(400).json({success: false, message: `The feedback period for this retrospective has already ended at ${feedbackPeriodEndDate}`});
         }

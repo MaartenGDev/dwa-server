@@ -12,5 +12,5 @@ export interface IRetrospective {
     actions: IAction[];
     evaluation?: IEvaluation;
     teamId: number;
-    team?: ITeam;
+    team?: ITeam|string;
 }

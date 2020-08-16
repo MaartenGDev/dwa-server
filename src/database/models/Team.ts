@@ -12,8 +12,8 @@ const roleSchema = new mongoose.Schema({
 
 const teamMemberSchema = new mongoose.Schema({
     roleId: String,
-    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-    role: {type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true},
+    role: {type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true, autopopulate: true},
 });
 
 const schema = new mongoose.Schema({
@@ -25,6 +25,9 @@ const schema = new mongoose.Schema({
 roleSchema.set('toJSON', {virtuals: true});
 teamMemberSchema.set('toJSON', {virtuals: true});
 schema.set('toJSON', {virtuals: true});
+
+schema.plugin(require('mongoose-autopopulate'));
+teamMemberSchema.plugin(require('mongoose-autopopulate'));
 
 export const Role = mongoose.model<IRole>('Role', roleSchema);
 export const TeamMember = mongoose.model<ITeamMember>('TeamMember', teamMemberSchema);

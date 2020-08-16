@@ -1,12 +1,13 @@
 import {IComment} from "./IComment";
 import {ITimeUsage} from "./ITimeUsage";
 import {IUser} from "./IUser";
-import {IUserRetrospective} from "./IUserRetrospective";
+import {IRetrospective} from "./IRetrospective";
 
 export interface IEvaluation {
     id?: string;
-    retrospective: IUserRetrospective|string;
+    retrospective: IRetrospective|string;
     sprintRating: number;
+    sprintRatingExplanation: string;
     suggestedActions: string;
     suggestedTopics: string;
     comments: IComment[];

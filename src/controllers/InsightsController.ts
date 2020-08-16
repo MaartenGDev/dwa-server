@@ -1,73 +1,90 @@
 import {Router} from "express";
 import {Retrospective} from "../database/models/Retrospective";
-import {IRetrospectiveReport} from "../models/IRetrospectiveReport";
-import {IUserRetrospective} from "../models/IUserRetrospective";
 import {Evaluation} from "../database/models/Evaluation";
-import {IEvaluation} from "../models/IEvaluation";
-import {ISuggestedTopic} from "../models/ISuggestedTopic";
 import {IUser} from "../models/IUser";
-import {ISuggestedAction} from "../models/ISuggestedAction";
-import {IComment} from "../models/IComment";
-import {DateHelper} from "../helpers/DateHelper";
-import {IInsight} from "../models/IInsight";
 import {ITeamMemberInsight} from "../models/ITeamMemberInsight";
-import {ITeamMemberTimeUsage} from "../models/ITeamMemberTimeUsage";
 import {IRatingInsight} from "../models/IRatingInsight";
 import {IRetrospective} from "../models/IRetrospective";
+import {InsightService} from "../services/InsightService";
+import {Team} from "../database/models/Team";
 
+const insightService = new InsightService();
 const router = Router();
 
+const isMemberOfTeam = async (teamId: string, userId: string) => {
+    const requestedTeam = await Team.findOne({_id: teamId});
+
+    return requestedTeam.members.some(m => m.user.id.toString() === userId);
+}
+
 router.get('/teams/:id/me', async (req, res, next) => {
-    const insight: IInsight = {
-        metrics: [],
-        evaluations: [],
-        history: {
-            datasets: [],
-            labels: []
-        }
+    if(!(await isMemberOfTeam(req.params.id, req.auth.userId))){
+        return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
     }
+
+    const insight = await insightService.getInsightForTeam(req.params.id, req.auth.userId);
 
     res.json(insight);
 });
 
 router.get('/teams/:teamId/members/:userId', async (req, res, next) => {
-    const insight: IInsight = {
-        metrics: [],
-        evaluations: [],
-        history: {
-            datasets: [],
-            labels: []
-        }
+    const requestedTeam = await Team.findOne({_id: req.params.teamId});
+    const isViewingOwnInsights = req.auth.userId === req.params.userId;
+    const canViewMemberInsights = isViewingOwnInsights || requestedTeam.members.some(m => m.user.id.toString() === req.auth.userId && m.role.canViewMemberInsights);
+
+    if(!canViewMemberInsights){
+        return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
     }
+
+    const insight = await insightService.getInsightForTeam(req.params.teamId, req.params.userId);
 
     res.json(insight);
 });
 
 router.get('/teams/:id/overall', async (req, res, next) => {
-    const insight: IInsight = {
-        metrics: [],
-        evaluations: [],
-        history: {
-            datasets: [],
-            labels: []
-        }
+    if(!(await isMemberOfTeam(req.params.id, req.auth.userId))){
+        return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
     }
+
+    const insight = await insightService.getInsightForTeam(req.params.id);
 
     res.json(insight);
 });
 
 router.get('/teams/:id/members', async (req, res, next) => {
+    if(!(await isMemberOfTeam(req.params.id, req.auth.userId))){
+        return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
+    }
+
     const insights: ITeamMemberInsight[] = [
-        {fullName: 'test', latestSprintRating: 1, latestSprintRatingChangePercentage: 10, timeUsage: [], userId: 'a'}
+        {fullName: 'test', latestSprintRating: 1, latestSprintRatingChangePercentage: 10, timeUsage: [], userId: req.auth.userId}
     ]
 
     res.json(insights);
 });
 
 router.get('/teams/:id/ratings', async (req, res, next) => {
-    const insights: IRatingInsight[] = [
-        {userId: 'a', fullName: 'test', sprintRating: 1, sprintRatingExplanation: 'Went ok', retrospective: {id: 'd', name: 'hello'} as IRetrospective}
-    ]
+    const requestedTeam = await Team.findOne({_id: req.params.id});
+    const canViewMemberInsights = requestedTeam.members.some(m => m.user.id.toString() === req.auth.userId && m.role.canViewMemberInsights);
+
+    if(!canViewMemberInsights){
+        return res.status(403).json({success: false, message: 'This team does not exist or you don\'t have access.'});
+    }
+
+    const retrospectives = await Retrospective.find({team: req.params.id}).select('id');
+    const evaluations = await Evaluation.find({retrospective: {$in: retrospectives.map(r => r._id)}});
+
+    const insights: IRatingInsight[] = evaluations.map(e => {
+        const user = e.user as IUser;
+
+        return {
+            userId: user.id,
+            fullName: user.fullName,
+            sprintRating: e.sprintRating,
+            sprintRatingExplanation: e.sprintRatingExplanation,
+            retrospective: e.retrospective as IRetrospective
+        }
+    });
 
     res.json(insights);
 });

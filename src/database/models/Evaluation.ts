@@ -34,6 +34,7 @@ commentSchema.set('toJSON', {virtuals: true});
 timeUsageCategorySchema.set('toJSON', {virtuals: true});
 timeUsageSchema.set('toJSON', {virtuals: true});
 schema.set('toJSON', {virtuals: true});
+schema.set('toObject', {virtuals: true});
 
 schema.plugin(require('mongoose-autopopulate'));
 timeUsageSchema.plugin(require('mongoose-autopopulate'));

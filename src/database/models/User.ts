@@ -13,12 +13,14 @@ const schema = new mongoose.Schema({
 });
 
 schema.set('toJSON', {
-    virtuals: true, transform: (doc, ret) => {
+    virtuals: true,
+    transform: (doc, ret) => {
         ret.id = ret._id;
 
         delete ret.password;
         return ret;
     }
 });
+schema.set('toObject', { virtuals: true});
 
 export const User = mongoose.model<IUser & mongoose.Document>('User', schema);

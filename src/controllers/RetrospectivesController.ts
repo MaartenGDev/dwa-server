@@ -9,13 +9,15 @@ import {IUser} from "../models/IUser";
 import {ISuggestedAction} from "../models/ISuggestedAction";
 import {IComment} from "../models/IComment";
 import {DateHelper} from "../helpers/DateHelper";
+import {ITeam} from "../models/ITeam";
+import {IRetrospective} from "../models/IRetrospective";
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
     const evaluationsOfUser = (await Evaluation.find({user: req.auth.userId}))
         .reduce((acc: {[key: string]: IEvaluation}, cur) => {
-            acc[(cur.retrospective as IUserRetrospective).id] = cur.toObject({virtuals: true});
+            acc[(cur.retrospective as IRetrospective).id] = cur.toObject({virtuals: true});
             return acc;
         }, {});
 
@@ -30,8 +32,8 @@ router.get('/', async (req, res, next) => {
             topics: retro.topics,
             actions: retro.actions,
             evaluation: evaluationsOfUser[retro.id],
-            teamId: retro.team.id,
-            team: retro.team,
+            teamId: (retro.team as ITeam).id,
+            team: retro.team as ITeam,
         }
     })
 
