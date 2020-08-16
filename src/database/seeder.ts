@@ -1,11 +1,14 @@
-import {connection} from "./connection";
 import {Role} from "./models/Team";
 import {data} from './seed';
+import connection from "./connection";
 
-try{
-    connection.then(async () => {
-        await Role.insertMany(data.roles);
-    }, err => console.log(err))
-}catch (e) {
-    console.warn('seeder failed', e);
+
+const run = async () => {
+    await connection.connect();
+    await Role.insertMany(data.roles);
+    await connection.disconnect();
 }
+
+run()
+    .then(() => console.log('Seeder finished!'))
+    .catch(e => console.log('Seeder failed', e));
