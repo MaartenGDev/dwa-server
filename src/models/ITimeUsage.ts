@@ -1,5 +1,8 @@
+import {ITimeUsageCategory} from "./ITimeUsageCategory";
+
 export interface ITimeUsage {
     id?: number;
     percentage: number;
-    categoryId: number;
+    categoryId: string;
+    category?: ITimeUsageCategory;
 }

@@ -5,6 +5,7 @@ import {IRetrospective} from "./IRetrospective";
 
 export interface IEvaluation {
     id?: string;
+    retrospectiveId?: string;
     retrospective: IRetrospective|string;
     sprintRating: number;
     sprintRatingExplanation: string;
