@@ -76,7 +76,7 @@ router.post('/', async (req, res, next) => {
 
         return res.json(retrospective);
     } catch (e) {
-        res.json({success: false, message: e.message});
+        res.status(400).json({success: false, message: e.message});
     }
 });
 
