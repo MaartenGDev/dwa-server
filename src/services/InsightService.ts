@@ -37,10 +37,13 @@ export class InsightService {
             }]
             : [];
 
+        const evaluations = hasActiveUserFilter
+            ? await Evaluation.find({user: userId})
+            : [];
 
         return {
             metrics: await this.getMetricsForRetrospectives(retrospectiveIds, customFilters, timeUsageCategories),
-            evaluations: [],
+            evaluations: evaluations,
             history: await this.getMetricHistoryForRetrospectives(retrospectives, retrospectiveIds, customFilters, timeUsageCategories)
         }
     }
@@ -200,7 +203,7 @@ export class InsightService {
                         '$first': '$user'
                     },
                     'latestSprintRating': {
-                        '$first': { $divide: ['$sprintRating', 10] }
+                        '$first': {$divide: ['$sprintRating', 10]}
                     },
                     'latestSprintRatingChangePercentage': {
                         '$first': 0

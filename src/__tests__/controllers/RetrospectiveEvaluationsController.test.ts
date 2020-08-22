@@ -4,9 +4,7 @@ import {app} from '../../app'
 import connection from "../../database/connection";
 import {Role, Team} from "../../database/models/Team";
 import {data} from "../../database/seed";
-import {TeamMemberRoleIdentifiers} from "../../database/TeamMemberRoleIdentifiers";
 import {IUserRetrospective} from "../../models/IUserRetrospective";
-import exp from "constants";
 import {IEvaluation} from "../../models/IEvaluation";
 import {ITimeUsage} from "../../models/ITimeUsage";
 import {TimeUsageCategory} from "../../database/models/Evaluation";
