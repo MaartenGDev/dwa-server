@@ -9,6 +9,7 @@ Server for the retrospective [client](https://github.com/MaartenGDev/dwa-client)
 
 ## Stack
 - NodeJS
+- Typescript (hot-reloading using [nodemon](https://nodemon.io/) and [tsc](https://www.typescriptlang.org/docs/handbook/compiler-options.html))
 - [Express](https://expressjs.com/)
 - MongoDB + [Mongoose](https://mongoosejs.com/)
 - [Jest](https://jestjs.io/) + [supertest](https://github.com/visionmedia/supertest)
